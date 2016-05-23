@@ -4,7 +4,7 @@
 'use strict'
 
 let state = "WAITING_FOR_FILES"
-let qmbldata = []
+let qmbldata
 
 let dropbox = document.getElementById('dropbox')
 dropbox.addEventListener('click', function() {
@@ -37,6 +37,7 @@ window.receiveFiles = function(files) {
 
 function doParse(title, data) {
   state = "PARSING"
+  qmbldata = []
   let parser = new DOMParser()
   let dom = parser.parseFromString(data, 'text/xml')
   let documentobj = dom.children[0]
@@ -67,7 +68,12 @@ function doParse(title, data) {
     })
     qmbldata.push(thisDataset)
   })
-  console.log(qmbldata)
+  
+  if (!qmbldata.length) {
+    state = "WAITING_FOR_FILES"
+    dropbox.innerHTML = "That file is either empty or not valid qmbl data.<p>Ready to accept another file</p>"
+  }
+  
   let table = []
   let tableLength = 0
   qmbldata.forEach(dataset=>{
@@ -78,6 +84,7 @@ function doParse(title, data) {
       table.push(row)
     })
   })
+  
   table.forEach(row=>row.length = tableLength)
   let tableT = table[0].map(function(col, i) { 
     return table.map(function(row) { 
@@ -96,14 +103,29 @@ function doParse(title, data) {
   download.click()
   
   state = "WAITING_FOR_FILES"
-  dropbox.innerHTML = 'Converted!<p>Ready to drop another file</p>'
+  dropbox.innerHTML = 'Converted!<p>Ready to accept another file</p>'
 }
 
-dropbox.addEventListener("dragenter", sppd, false);
-dropbox.addEventListener("dragover", sppd, false);
+dropbox.addEventListener("dragenter", function(e) {
+  sppd(e)
+  dropbox.classList.add('dropping')
+}, false)
+dropbox.addEventListener("dragover", function(e) {
+  sppd(e)
+  dropbox.classList.add('dropping')
+}, false)
+dropbox.addEventListener('dragleave', function(e) {
+  sppd(e)
+  dropbox.classList.remove('dropping')
+}, false)
+dropbox.addEventListener('dragout', function(e) {
+  sppd(e)
+  dropbox.classList.remove('dropping')
+}, false)
 dropbox.addEventListener("drop", function(e) {
+  dropbox.classList.remove('dropping')
   sppd(e)
   receiveFiles(e.dataTransfer.files)
-}, false);
+}, false)
 
 }()
