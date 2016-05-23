@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KILL QMBL</title>
+  <link rel="stylesheet" href="main.css" type="text/css" />
+</head>
+<body>
+  <div id="dropbox" class="drophere">
+    Drag a .qmbl file here, or click to pick a file
+    <p>.cmbl and .gmbl should work (but are untested)</p>
+  </div>
+  <input 
+    type="file"
+    name="picker"
+    accept=".qmbl,.cmbl,.gmbl"
+    onchange="receiveFiles(this.files)">
+  <script type="text/javascript" src="script.js"></script>
+</body>
+</html>
